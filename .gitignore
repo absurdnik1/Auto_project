@@ -1,2 +1,11 @@
-.venv
+venv/
+.env/
+.venv/
+# База данных
+*.db
 *.sqlite3
+*.sqlitedb
+*.mdf
+*.mdb
+*.dbf
+*.sqlite
