@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ title_page }}</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% if object.image %}
+                    <div style="text-align: left;">
+                        <img src="{{ object.image.url }}"
+                             alt="{{ object.title }}"
+                             class="card-img-top img-fluid"
+                             style="max-width: 300px; height: auto; margin: 20px 0;">
+                    </div>
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                         style="height: 150px; margin: 20px 0;">
+                        <span class="text-muted fw-light fs-4">Нет изображения</span>
+                    </div>
+                {% endif %}
+
+                {{ form.as_p }}
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'main_page' %}" class="btn btn-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

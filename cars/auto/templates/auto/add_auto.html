@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ title_page }}</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Основная информация -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        Основные данные
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% if field.name in 'title,slug' %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Технические характеристики -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        Технические характеристики
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% if field.name in 'weight,trunk_capacity,wheel_size,numbers_of_seats' %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Безопасность и топливо -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        Безопасность и топливо
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% if field.name in 'safety_rating,fuel_tank_capacity,fuel_type' %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Связанные модели -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        Связи с другими моделями
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% if field.name in 'category,engine,transmission' %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Дополнительно -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        Дополнительная информация
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% if field.name in 'color,drive' %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Изображение -->
+                        <div class="mb-3">
+                            {{ form.image.label_tag }}
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.image.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.image.help_text %}
+                                <small class="form-text text-muted">{{ form.image.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Временные метки -->
+                        <div class="mb-3">
+                            <small class="text-muted">Время создания будет установлено автоматически</small><br>
+                            <small class="text-muted">Время обновления будет обновляться при каждом сохранении</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-4">
+            Сохранить автомобиль
+        </button>
+    </form>
+</div>
+{% endblock %}
