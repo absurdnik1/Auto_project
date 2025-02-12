@@ -9,4 +9,5 @@ urlpatterns = [
     path('edit_auto/<slug:auto_slug>/', views.UpdateAuto.as_view(), name='update_auto'),
     path('delete_auto/<slug:auto_slug>/', views.DeleteAuto.as_view(), name='delete_auto'),
     path('detail_auto/<slug:auto_slug>/', views.DetailAuto.as_view(), name='detail_auto'),
+    path('about', views.about, name='about_site'),
 ]

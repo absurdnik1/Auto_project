@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 
-from auto.models import Auto
+from auto.models import Auto, Category
 
 
 # Create your views here.
@@ -56,28 +56,28 @@ class MainPage(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Auto.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = Category.objects.all()
+        context['categories'] = categories
+        return context
 
 
 class CategoryAuto(ListView):
     model = Auto
     template_name = 'auto/category.html'
+    context_object_name = 'autos'
     paginate_by = 5
 
     def get_queryset(self):
-        return Auto.objects.filter(slug=self.kwargs['cat_slug']).select_related('category')
+        return Auto.objects.filter(category__slug=self.kwargs['cat_slug'])
 
 
 
+def about(request):
+    return render(request, 'auto/about_site.html')
 
-
-def category(request, cat_slug):
-    # if cat_slug in categories:
-    # return HttpResponse(f"Categories auto with category:{cat_slug}")
-    # else:
-    # return HttpResponse(f"There is no such category as {cat_slug}")
-    if request.GET:
-        print(request.GET)
-    return HttpResponse(f"Categories auto with category - {cat_slug}")
 
 
 

@@ -11,6 +11,24 @@
 </head>
 <body>
     <div class="container">
+        <!-- Верхняя навигационная панель -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container-fluid">
+                <!-- Левые кнопки -->
+                <div class="d-flex">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'create_page' %}" class="btn btn-primary me-2">Добавить авто</a>
+                    {% endif %}
+                    <a href="{% url 'main_page' %}" class="btn btn-secondary">Главная страница</a>
+                </div>
+
+                <!-- Правые кнопки -->
+                <div class="d-flex ms-auto">
+                    <a href="{% url 'about_site' %}" class="btn btn-outline-primary">О сайте</a>
+                </div>
+            </div>
+        </nav>
+
         {% block content %}{% endblock %}
     </div>
 </body>
