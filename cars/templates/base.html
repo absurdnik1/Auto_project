@@ -20,6 +20,7 @@
                     <a href="{% url 'main_page' %}" class="btn btn-secondary me-2">Главная</a>
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'create_page' %}" class="btn btn-primary">Добавить авто</a>
+                    <a href="{% url 'parse_from_drom' %}" class="btn btn-success">Выгрузить с Drom</a>
                     {% endif %}
                 </div>
 

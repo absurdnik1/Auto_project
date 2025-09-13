@@ -9,6 +9,9 @@
         {% endif %}
         <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ auto.title }}</h5>
+            <p>Цена: {{ auto.price }} рублей</p>
+            <p>Пробег: {{ auto.mileage }} км</p>
+            <p>Мощность: {{ auto.engine.power }} л.с</p>
             <p>Багажник: {{ auto.trunk_capacity }} л</p>
             <p>Безопасность: {{ auto.safety_rating }}/10</p>
             <p>Привод: {{ auto.get_drive_display }}</p>

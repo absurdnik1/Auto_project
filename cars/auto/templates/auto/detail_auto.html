@@ -17,6 +17,9 @@
             {% endif %}
 
             <div class="mb-3">
+                <strong>Цена:</strong> {{ auto.price }}<br>
+                <strong>Мощность:</strong> {{ auto.engine.power }} л.с<br>
+                <strong>Пробег:</strong> {{ auto.mileage }}<br>
                 <strong>Категория:</strong> {{ auto.category.title }}<br>
                 <strong>Двигатель:</strong> {{ auto.engine.title }}<br>
                 <strong>Трансмиссия:</strong> {{ auto.transmission.title }}<br>

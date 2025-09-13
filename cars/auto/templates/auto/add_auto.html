@@ -15,7 +15,7 @@
                     </div>
                     <div class="card-body">
                         {% for field in form %}
-                            {% if field.name in 'title,slug,production_year' %}
+                            {% if field.name in 'title,slug,production_year, price, mileage' %}
                                 <div class="mb-3">
                                     {{ field.label_tag }}
                                     {% if field.field.required %}

@@ -21,7 +21,7 @@ class Engine(models.Model):
 
 class Transmission(models.Model):
     transmission_choices = (('0', 'automatic'),('1', 'manual'))
-    title = models.CharField(max_length=255, verbose_name='Transmission title')
+    title = models.CharField(default="Unknown", max_length=255, verbose_name='Transmission title')
     transmission_type = models.CharField(max_length=100, choices=transmission_choices, default=transmission_choices[0],
                                          verbose_name='Transmission type')
 
@@ -99,29 +99,33 @@ class Auto(models.Model):
     )
     weight = models.IntegerField(default=1000, verbose_name='Weight')
     drive = models.CharField(max_length=100, choices=drive_choices, default=drive_choices[0], verbose_name='drive')
-    trunk_capacity = models.IntegerField(verbose_name='Trunk_capacity', validators=[
+    trunk_capacity = models.IntegerField(default=300, verbose_name='Trunk_capacity', validators=[
         MaxValueValidator(1000, message='Max 1000 kg'),
         MinValueValidator(100, message='Min 100 kg')
     ])
     image = models.ImageField(upload_to='photos/%Y/%m/%d/', default=None, blank=True, null=True, verbose_name='Auto image')
-    wheel_size = models.IntegerField(validators=[
+    wheel_size = models.IntegerField(default=15, validators=[
         MinValueValidator(10, message='Min 10R'),
         MaxValueValidator(25, message='Max 25R')],
         verbose_name='Wheel size')
-    numbers_of_seats = models.IntegerField(validators=[
+    numbers_of_seats = models.IntegerField(default=5, validators=[
         MinValueValidator(2, 'Min 2 seats'),
         MaxValueValidator(9, 'Max 9 seats')
     ],
         verbose_name='Numbers of seats')
     safety_rating = models.IntegerField(choices=safety_ratings, default=safety_ratings[0], verbose_name='Safety_rating')
-    fuel_tank_capacity = models.IntegerField(validators=[
+    fuel_tank_capacity = models.IntegerField(default=50, validators=[
         MinValueValidator(5, message='Min 5 liters'),
         MaxValueValidator(10000, message='Max 10000 liters')
     ])
     fuel_type = models.CharField(max_length=100, choices=fuel_types, default=fuel_types[0])
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Creation time')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Update time')
-    production_year = models.IntegerField(validators=[MinValueValidator(1960), max_value_current_year], default=2000)
+    production_year = models.IntegerField(default=2000, validators=[MinValueValidator(1960), max_value_current_year])
+    price = models.IntegerField(default=0, verbose_name="Price")
+    mileage = models.IntegerField(default=0, verbose_name="Mileage")
+    url = models.URLField(max_length=500, null=True, blank=True, verbose_name="Drom URL")
+
 
     def __str__(self):
         return self.title

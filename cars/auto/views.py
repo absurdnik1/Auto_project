@@ -1,13 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.db.models import Q, Value, Max
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django.views.generic.base import View
-
+from . import parse_from_drom
 from .models import Auto, Category, Review, Comment
 from .forms import ReviewForm, CommentForm
+from .parse_from_drom import parse_ford_page
+
 
 # Create your views here.
 
@@ -15,7 +17,7 @@ from .forms import ReviewForm, CommentForm
 class AddAuto(LoginRequiredMixin, CreateView):
     model = Auto
     template_name = 'auto/add_auto.html'
-    fields = ['title', 'slug', 'category', 'engine', 'transmission', 'color', 'weight',
+    fields = ['title', 'slug', 'mileage', 'price', 'category', 'engine', 'transmission', 'color', 'weight',
               'drive', 'trunk_capacity', 'image', 'wheel_size', 'numbers_of_seats',
               'safety_rating', 'fuel_tank_capacity', 'fuel_type', 'production_year']
     extra_context = {'title_page': 'Add Auto'}
@@ -23,7 +25,7 @@ class AddAuto(LoginRequiredMixin, CreateView):
 
 class UpdateAuto(LoginRequiredMixin, UpdateView):
     model = Auto
-    fields = ['title', 'category', 'engine', 'transmission', 'color', 'weight',
+    fields = ['title', 'slug', 'mileage', 'price', 'category', 'engine', 'transmission', 'color', 'weight',
               'drive', 'trunk_capacity', 'image', 'wheel_size', 'numbers_of_seats',
               'safety_rating', 'fuel_tank_capacity', 'fuel_type', 'production_year']
     template_name = 'auto/update_auto.html'
@@ -67,11 +69,11 @@ class MainPage(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Auto.objects.all().select_related('transmission')
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         categories = Category.objects.all()
-        autos = Auto.objects.select_related('transmission')
+        autos = Auto.objects.select_related('transmission', 'engine')
         context['categories'] = categories
 
         category_autos = {}
@@ -79,13 +81,15 @@ class MainPage(LoginRequiredMixin, ListView):
             category_autos[cat.slug] = autos.filter(category=cat)
         context['category_autos'] = category_autos
         context['filtered_by_tank'] = autos.order_by('-trunk_capacity')
-        context['safe'] = autos.filter(Q(wheel_size__gte=18) | Q(safety_rating__gte=5)).annotate(descr=Value('Safe as fuck'))
+        context['safe'] = autos.filter(Q(wheel_size__gte=18) | Q(safety_rating__gte=5)).annotate(
+            descr=Value('Safe as fuck'))
         context['4WD'] = autos.filter(Q(drive='2'))
         context['automatic_transmission'] = autos.filter(transmission__transmission_type='0')
         context['manual_transmission'] = autos.filter(transmission__transmission_type='1')
         context['production_year'] = autos.all().order_by('-production_year')
         context['score'] = autos.annotate(max_score=Max('reviews__score')).order_by('-max_score')
         return context
+
 
 
 class CategoryAuto(LoginRequiredMixin, ListView):
@@ -185,6 +189,12 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('detail_auto', kwargs={'auto_slug': self.object.review.auto.slug})
 
+
+def parse_from_drom(request):
+    url = "https://auto.drom.ru/ford/"
+    # url2 = "https://auto.drom.ru/mercedes-benz/"
+    parse_ford_page(url)
+    return redirect('main_page')
 
 def about(request):
     return render(request, 'auto/about_site.html')
