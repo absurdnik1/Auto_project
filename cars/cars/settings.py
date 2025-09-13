@@ -39,16 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'auto.apps.AutoConfig',
+    'debug_toolbar',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
 ]
 
 ROOT_URLCONF = 'cars.urls'
@@ -68,6 +76,16 @@ TEMPLATES = [
         },
     },
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # 1 — номер базы Redis
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 WSGI_APPLICATION = 'cars.wsgi.application'
 
@@ -113,7 +131,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+LOGIN_URL = 'login'               # куда редиректит, если не авторизован
+LOGIN_REDIRECT_URL = 'main_page'  # куда редирект после успешного логина
+LOGOUT_REDIRECT_URL = 'login' # куда редирект после логаута
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 

@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from django.core.validators import MinLengthValidator, MaxLengthValidator, RegexValidator, MaxValueValidator, \
     MinValueValidator
 from django.db import models
 from django.shortcuts import reverse
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Engine(models.Model):
@@ -46,6 +49,12 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 
+def current_year():
+    return datetime.now().year
+
+def max_value_current_year(value):
+    return MaxValueValidator(current_year(), value)
+
 class Auto(models.Model):
     drive_choices = (('0','front wheel drive'),
                      ('1','rear wheel drive'),
@@ -64,6 +73,7 @@ class Auto(models.Model):
                   ('дизель', 'diesel'),
                   ('водород', 'hydrogen'),
                   ('электро', 'electro'))
+    today_year = datetime.now().year
     title = models.CharField(max_length=255, verbose_name='Title auto')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='Slug',
                             validators=[
@@ -111,6 +121,7 @@ class Auto(models.Model):
     fuel_type = models.CharField(max_length=100, choices=fuel_types, default=fuel_types[0])
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Creation time')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Update time')
+    production_year = models.IntegerField(validators=[MinValueValidator(1960), max_value_current_year], default=2000)
 
     def __str__(self):
         return self.title
@@ -137,3 +148,31 @@ class Truck(Auto):
         verbose_name = 'Truck',
         verbose_name_plural = 'Trucks'
         ordering = ['-time_create']
+
+
+class Review(models.Model):
+    text = models.TextField(max_length=1000, verbose_name='Review text')
+    auto = models.ForeignKey('Auto', on_delete=models.CASCADE, related_name='reviews', verbose_name='Auto')
+    score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], verbose_name='Score')
+    pub_date = models.DateTimeField(auto_now_add=True, verbose_name='Publication date')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews', verbose_name='User')
+
+    def __str__(self):
+        return f'{self.user.username} - {self.auto.title}'
+
+    class Meta:
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
+
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', verbose_name='User')
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments', verbose_name='Review')
+    text = models.TextField(max_length=200, verbose_name='Comment text')
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+

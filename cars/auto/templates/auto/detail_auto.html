@@ -1,100 +1,133 @@
 {% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1>{{ auto.title }}</h1>
 
+    <!-- Детальная информация авто -->
+    <h1>{{ auto.title }}</h1>
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             {% if auto.image %}
-                <div style="text-align: left;" class="mb-3">
-                    <img src="{{ auto.image.url }}"
-                         alt="{{ auto.title }}"
-                         class="card-img-top img-fluid"
-                         style="max-width: 300px; height: auto; margin: 20px 0;">
-                </div>
+                <img src="{{ auto.image.url }}" alt="{{ auto.title }}" class="img-fluid mb-3" style="max-width:300px;">
             {% else %}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                     style="height: 150px; margin: 20px 0;">
-                    <span class="text-muted fw-light fs-4">Нет изображения</span>
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:150px; margin-bottom:20px;">
+                    <span class="text-muted">Нет изображения</span>
                 </div>
             {% endif %}
 
-            <div class="specifications mb-4">
-                <div class="mb-2">
-                    <small class="text-muted">Категория:</small><br>
-                    {{ auto.category.title }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Двигатель:</small><br>
-                    {{ auto.engine.title }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Трансмиссия:</small><br>
-                    {{ auto.transmission.title }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Цвет:</small><br>
-                    <span style="color: {{ auto.color }};">{{ auto.color }}</span>
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Вес:</small><br>
-                    {{ auto.weight }} кг
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Тип привода:</small><br>
-                    {{ auto.get_drive_display }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Объем багажника:</small><br>
-                    {{ auto.trunk_capacity }} л
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Размер колес:</small><br>
-                    {{ auto.wheel_size }}R
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Количество мест:</small><br>
-                    {{ auto.numbers_of_seats }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Рейтинг безопасности:</small><br>
-                    {{ auto.safety_rating }}/10
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Объем топливного бака:</small><br>
-                    {{ auto.fuel_tank_capacity }} л
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Тип топлива:</small><br>
-                    {{ auto.get_fuel_type_display }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Дата создания:</small><br>
-                    {{ auto.time_create|date:"d.m.Y H:i" }}
-                </div>
-
-                <div class="mb-2">
-                    <small class="text-muted">Дата обновления:</small><br>
-                    {{ auto.time_update|date:"d.m.Y H:i" }}
-                </div>
+            <div class="mb-3">
+                <strong>Категория:</strong> {{ auto.category.title }}<br>
+                <strong>Двигатель:</strong> {{ auto.engine.title }}<br>
+                <strong>Трансмиссия:</strong> {{ auto.transmission.title }}<br>
+                <strong>Цвет:</strong> <span style="color: {{ auto.color }}">{{ auto.color }}</span><br>
+                <strong>Вес:</strong> {{ auto.weight }} кг<br>
+                <strong>Тип привода:</strong> {{ auto.get_drive_display }}<br>
+                <strong>Объем багажника:</strong> {{ auto.trunk_capacity }} л<br>
+                <strong>Размер колес:</strong> {{ auto.wheel_size }}R<br>
+                <strong>Количество мест:</strong> {{ auto.numbers_of_seats }}<br>
+                <strong>Рейтинг безопасности:</strong> {{ auto.safety_rating }}/10<br>
+                <strong>Объем топливного бака:</strong> {{ auto.fuel_tank_capacity }} л<br>
+                <strong>Тип топлива:</strong> {{ auto.get_fuel_type_display }}<br>
+                <strong>Дата создания:</strong> {{ auto.time_create|date:"d.m.Y H:i" }}<br>
+                <strong>Дата обновления:</strong> {{ auto.time_update|date:"d.m.Y H:i" }}
             </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'main_page' %}" class="btn btn-secondary">Назад</a>
-            </div>
+            <a href="{% url 'main_page' %}" class="btn btn-secondary">Назад</a>
         </div>
     </div>
+
+    <!-- Блок отзывов -->
+    <div class="card shadow-sm p-4 mb-4">
+        <h3>Отзывы</h3>
+
+        {% if auto.reviews.all %}
+            <ul class="list-group mb-4">
+                {% for review in auto.reviews.all %}
+                    <li class="list-group-item mb-2" id="review-{{ review.pk }}">
+                        {% if editing_review and editing_review.pk == review.pk %}
+                            <!-- Форма редактирования отзыва -->
+                            <form method="post" action="{% url 'update_review' review.pk %}">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                                <a href="{% url 'detail_auto' auto.slug %}" class="btn btn-sm btn-secondary">Отмена</a>
+                            </form>
+                        {% else %}
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ review.user.username }}</strong> ({{ review.score }}/10)<br>
+                                    {{ review.text }}<br>
+                                    <small class="text-muted">{{ review.pub_date|date:"d.m.Y H:i" }}</small>
+                                </div>
+                                {% if request.user == review.user %}
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'update_review' review.pk %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                                        <a href="{% url 'delete_review' review.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Комментарии к отзыву -->
+                        {% if review.comments.all %}
+                            <ul class="list-group mt-2">
+                                {% for comment in review.comments.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        {% if editing_comment and editing_comment.pk == comment.pk %}
+                                            <!-- Форма редактирования комментария -->
+                                            <form method="post" action="{% url 'update_comment' comment.pk %}" class="w-100">
+                                                {% csrf_token %}
+                                                {% bootstrap_form form %}
+                                                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                                                <a href="{% url 'detail_auto' auto.slug %}" class="btn btn-sm btn-secondary">Отмена</a>
+                                            </form>
+                                        {% else %}
+                                            <div>
+                                                <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+                                                <br><small class="text-muted">{{ comment.pub_date|date:"d.m.Y H:i" }}</small>
+                                            </div>
+                                            {% if request.user == comment.user %}
+                                                <div class="d-flex gap-2">
+                                                    <a href="{% url 'update_comment' comment.pk %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                                                    <a href="{% url 'delete_comment' comment.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        <!-- Форма добавления комментария -->
+                        {% if request.user.is_authenticated %}
+                            <form method="post" action="{% url 'create_comment' review.pk %}" class="mt-2">
+                                {% csrf_token %}
+                                <div class="mb-2">
+                                    <textarea name="text" class="form-control" rows="2" placeholder="Оставить комментарий"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Комментировать</button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Отзывов пока нет.</p>
+        {% endif %}
+
+        <!-- Форма добавления нового отзыва -->
+        {% if request.user.is_authenticated %}
+            <h4>Оставить отзыв</h4>
+            <form method="post" action="{% url 'create_review' auto.slug %}">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-success">Отправить</button>
+            </form>
+        {% else %}
+            <p class="text-muted">Чтобы оставить отзыв, <a href="{% url 'login' %}">войдите</a>.</p>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+
+
 from . import views
 
 urlpatterns = [
@@ -9,5 +12,16 @@ urlpatterns = [
     path('edit_auto/<slug:auto_slug>/', views.UpdateAuto.as_view(), name='update_auto'),
     path('delete_auto/<slug:auto_slug>/', views.DeleteAuto.as_view(), name='delete_auto'),
     path('detail_auto/<slug:auto_slug>/', views.DetailAuto.as_view(), name='detail_auto'),
+    path('detail_auto/<slug:auto_slug>/create_review/', views.CreateAutoReview.as_view(), name='create_review'),
+    path('review/<int:pk>/update/', views.UpdateReview.as_view(), name='update_review'),
+    path('review/<int:pk>/delete/', views.DeleteReview.as_view(), name='delete_review'),
+    path('review/<int:review_pk>/comment/', views.CreateComment.as_view(), name='create_comment'),
+    path('comment/<int:pk>/update/', views.UpdateComment.as_view(), name='update_comment'),
+    path('comment/<int:pk>/delete/', views.DeleteComment.as_view(), name='delete_comment'),
     path('about', views.about, name='about_site'),
 ]
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns

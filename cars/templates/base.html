@@ -1,3 +1,4 @@
+{% load static %}
 {% load django_bootstrap5 %}
 
 <!DOCTYPE html>
@@ -5,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Автомобили</title>
+    <title>{% block title %}Автомобили{% endblock %}</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 </head>
@@ -16,15 +17,23 @@
             <div class="container-fluid">
                 <!-- Левые кнопки -->
                 <div class="d-flex">
+                    <a href="{% url 'main_page' %}" class="btn btn-secondary me-2">Главная</a>
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'create_page' %}" class="btn btn-primary me-2">Добавить авто</a>
+                        <a href="{% url 'create_page' %}" class="btn btn-primary">Добавить авто</a>
                     {% endif %}
-                    <a href="{% url 'main_page' %}" class="btn btn-secondary">Главная страница</a>
                 </div>
 
                 <!-- Правые кнопки -->
-                <div class="d-flex ms-auto">
-                    <a href="{% url 'about_site' %}" class="btn btn-outline-primary">О сайте</a>
+                <div class="d-flex ms-auto align-items-center gap-2">
+                    {% if request.user.is_authenticated %}
+                        <span>Привет, {{ request.user.username }}!</span>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Выйти</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Войти</a>
+                    {% endif %}
                 </div>
             </div>
         </nav>
