@@ -20,6 +20,7 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', views.DeleteComment.as_view(), name='delete_comment'),
     path('about', views.about, name='about_site'),
     path('parse_auto', views.parse_from_drom, name="parse_from_drom"),
+    path('api/cars/', views.car_list, name='car_list'),
 ]
 
 

@@ -63,7 +63,16 @@ def parse_ford_page(url):
 
         fuel_type = fuel_map.get(specs[1], "бензин") if len(specs) > 1 else "бензин"
         transmission_type = transmission_map.get(specs[2], "0") if len(specs) > 2 else "0"
-        drive = drive_map.get(specs[3], "0") if len(specs) > 3 else "0"
+        raw_drive = specs[3].lower() if len(specs) > 3 else ""
+        if "передн" in raw_drive:
+            drive = "0"
+        elif "задн" in raw_drive:
+            drive = "1"
+        elif "полн" in raw_drive or "4wd" in raw_drive or "awd" in raw_drive:
+            drive = "2"
+        else:
+            drive = "0"  # дефолт
+        #drive = drive_map.get(specs[3], "0") if len(specs) > 3 else "0"
         mileage = safe_int(specs[4]) if len(specs) > 4 else 0
 
         # Цена
@@ -79,7 +88,7 @@ def parse_ford_page(url):
 
         # Создание авто без картинки сначала
         safety_rating_default = Auto.safety_ratings[0][0]
-        auto = Auto.objects.create(
+        auto = Auto(
             title=title_name,
             slug=slug,
             category=None,
@@ -103,13 +112,13 @@ def parse_ford_page(url):
         # Скачиваем и сохраняем изображение
         if img_url:
             try:
-                response = requests.get(img_url)
+                response = requests.get(img_url, timeout=10)
                 if response.status_code == 200:
+                    auto.save()
                     auto.image.save(f"{slug}.jpg", ContentFile(response.content), save=True)
+                    autos.append(auto)
             except Exception as e:
                 print(f"Не удалось скачать изображение: {img_url}, ошибка: {e}")
-
-        autos.append(auto)
 
     return autos
 

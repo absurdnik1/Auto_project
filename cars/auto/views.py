@@ -1,3 +1,6 @@
+import json
+from xml.etree.ElementTree import indent
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -5,7 +8,11 @@ from django.urls import reverse_lazy
 from django.db.models import Q, Value, Max
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django.views.generic.base import View
-from . import parse_from_drom
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+
+from .serializers import AutoSerializer
 from .models import Auto, Category, Review, Comment
 from .forms import ReviewForm, CommentForm
 from .parse_from_drom import parse_ford_page
@@ -37,7 +44,7 @@ class UpdateAuto(LoginRequiredMixin, UpdateView):
 class DeleteAuto(LoginRequiredMixin, DeleteView):
     model = Auto
     template_name = 'auto/delete_auto.html'
-    success_url = 'auto/delete_auto.html'
+    success_url = reverse_lazy('main_page')
     title_page = 'Delete Auto'
     slug_url_kwarg = 'auto_slug'
 
@@ -68,7 +75,7 @@ class MainPage(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Auto.objects.all().select_related('transmission')
+        return Auto.objects.all().select_related('transmission', 'engine')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -190,11 +197,22 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
         return reverse_lazy('detail_auto', kwargs={'auto_slug': self.object.review.auto.slug})
 
 
+@api_view(['GET'])
+@renderer_classes([JSONRenderer])
+def car_list(request):
+    autos = Auto.objects.select_related('engine', 'transmission')
+    serializer = AutoSerializer(autos, many=True)
+    json_data = json.dumps(serializer.data, indent=4, ensure_ascii=False)
+    # Возвращаем как чистый JSON (без интерфейса DRF)
+    return HttpResponse(json_data, content_type='application/json')
+
+
 def parse_from_drom(request):
-    url = "https://auto.drom.ru/ford/"
+    url = "https://auto.drom.ru/lexus/"
     # url2 = "https://auto.drom.ru/mercedes-benz/"
     parse_ford_page(url)
     return redirect('main_page')
+
 
 def about(request):
     return render(request, 'auto/about_site.html')
